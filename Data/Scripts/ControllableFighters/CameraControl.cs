@@ -19,7 +19,6 @@ using VRage.Input;
 using VRage;
 using Sandbox.Engine.Physics;
 using Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts;
-using Controllable_Fighters.Data.Scripts.ControllableFighters.CON_PlaneParts;
 
 namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 {
@@ -41,7 +40,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                 return;
             MyAPIGateway.Session.CameraController.IsInFirstPersonView = false;
 
-            ShipEntity.Init();
+            ShipEntity.Init(ModContext);
         }
 
         public override void UpdateBeforeSimulation()
@@ -54,16 +53,21 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 
             ShipEntity.Update(EnableDebug);
 
+            MyAPIGateway.Utilities.ShowNotification($"Controlling: {IsControllingShip} | Throttle: {Math.Round(ShipEntity.Throttle * 100, 0)}", 1000 / 60);
+            MyAPIGateway.Utilities.ShowNotification($"ShipVel: {Math.Round(ShipEntity.Physics.LinearVelocity.Length(), 1)}", 1000 / 60);
+
             if (CameraController == null || ShipEntity.Physics == null)
                 return;
 
             if (IsControllingShip)
             {
-                ShipEntity.Physics.LinearVelocity += Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix);
-                ShipEntity.Physics.AngularVelocity += Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix);
+                //ShipEntity.Physics.LinearVelocity += Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix);
+                //ShipEntity.Physics.AngularVelocity += Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix);
                 //ShipEntity.Physics.SetSpeeds(
                 //    ShipEntity.Physics.LinearVelocity + Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix),
                 //    Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix));
+
+
             }
         }
 
@@ -84,6 +88,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 
             if (IsControllingShip)
             {
+                // Exit ship
                 if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F6))
                     SetControllingShip(false);
                 if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F7))
@@ -92,6 +97,12 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                     SetControllingShip(false);
                 if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F9))
                     SetControllingShip(false);
+
+                // Throttle
+                if (MyAPIGateway.Input.IsKeyPress(MyKeys.Shift))
+                    ShipEntity.Throttle += 0.01f;
+                if (MyAPIGateway.Input.IsKeyPress(MyKeys.Control))
+                    ShipEntity.Throttle -= 0.01f;
             }
         }
 
@@ -99,10 +110,6 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         {
             //if (MyAPIGateway.Utilities.IsDedicated || !IsControllingShip)
             //    return;
-
-            MyAPIGateway.Utilities.ShowNotification($"Controlling: {IsControllingShip} | Static: {ShipEntity.Physics.IsStatic}", 1000 / 60);
-            MyAPIGateway.Utilities.ShowNotification($"ShipVel: {Math.Round(ShipEntity.Physics.LinearVelocity.Length(), 1)}", 1000 / 60);
-
             if (CameraController == null)
                 return;
 

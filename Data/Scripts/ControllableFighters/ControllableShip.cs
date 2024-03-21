@@ -8,8 +8,10 @@ using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
+using VRage.Game.ModAPI;
 using VRage.ModAPI;
 using VRageMath;
 using CollisionLayers = Sandbox.Engine.Physics.MyPhysics.CollisionLayers;
@@ -18,9 +20,9 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 {
     internal class ControllableShip : MyEntity
     {
-        public virtual void Init()
+        public virtual void Init(IMyModContext ModContext)
         {
-            Init(null, "Models\\Weapons\\Projectile_Missile.mwm", null, null);
+            Init(null, ModContext.ModPath + "\\Models\\PlaneModel.mwm", null, null);
             Save = false;
             NeedsWorldMatrix = false;
 

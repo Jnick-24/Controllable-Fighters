@@ -11,7 +11,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 {
     internal class CT_Engine
     {
-        float Throttle = 1.0f;
+        public float Throttle = 0f;
         float Thrust;
 
         public CT_Engine(float thrust)
@@ -19,9 +19,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             Thrust = thrust;
         }
 
-        public void ApplyForce(ControllablePlane plane)
+        public void ApplyForce(ControllablePlane plane, float delta = 1/60f)
         {
-            //plane.Physics.ApplyImpulse(plane.WorldMatrix.Forward * (Throttle * Thrust), Vector3D.Zero);
+            if (Throttle > 0)
+                plane.Physics.ApplyImpulse(plane.WorldMatrix.Forward * (Throttle * Thrust) * delta, plane.PositionComp.GetPosition());
         }
     }
 }
