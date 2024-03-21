@@ -17,6 +17,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
     {
         const float EfficencyRatio = 1;
 
+        string Name;
         CT_Airfoil Airfoil;
         Vector3D CenterOfPressure;
         float Area;
@@ -27,8 +28,9 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
         float ControlInput = 0;
 
-        public CT_Wing(Vector3D position, float span, float chord, CT_Airfoil airfoil, Vector3D normal, float flapRatio = 0.25f)
-        { 
+        public CT_Wing(string name, Vector3D position, float span, float chord, CT_Airfoil airfoil, Vector3D normal, float flapRatio = 0.25f)
+        {
+            Name = name;
             Airfoil = airfoil;
             CenterOfPressure = position;
             Area = span * chord;
@@ -86,15 +88,18 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
             if (debug)
             {
-                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(localVelocity, plane), Color.Green, 0.25f);
-                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(Vector3D.Forward * 100, plane), Color.White, 0.15f);
-                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(lift, plane), Color.Blue, 0.25f);
-                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(drag, plane), Color.Red, 0.25f);
-                DebugDraw.AddGPS("Fighter", plane.PositionComp.GetPosition(), 1/60f);
-                MyAPIGateway.Utilities.ShowNotification($"AoA: {Math.Round(angleOfAttack, 1)} | Drag: {drag.Length()} | Lift: {lift.Length()}", 1000/60);
+                Vector3D actualPosition = LocalToWorld(CenterOfPressure, plane);
+
+                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(localVelocity + CenterOfPressure, plane), Color.Green, 0.25f);
+                //DebugDraw.DrawLineZT(LocalToWorld(CenterOfPressure, plane), LocalToWorld(Vector3D.Forward * 100, plane), Color.White, 0.15f);
+                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(lift + CenterOfPressure, plane), Color.Blue, 0.25f);
+                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(drag + CenterOfPressure, plane), Color.Red, 0.25f);
+                DebugDraw.AddGPS(Name, actualPosition, 1/60f);
+
+                //MyAPIGateway.Utilities.ShowNotification($"AoA: {Math.Round(angleOfAttack, 1)} | Drag: {drag.Length()} | Lift: {lift.Length()}", 1000/60);
             }
 
-            plane.Physics.ApplyImpulse(Vector3D.Rotate((lift + drag), plane.WorldMatrix) * delta, CenterOfPressure);
+            plane.Physics.ApplyImpulse(Vector3D.Rotate(lift + drag, plane.WorldMatrix) * delta, LocalToWorld(CenterOfPressure, plane));
             //plane.Physics.AngularVelocity = Vector3.Zero;
         }
 

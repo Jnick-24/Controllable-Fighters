@@ -30,6 +30,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 
         ControllablePlane ShipEntity = new ControllablePlane();
         bool IsControllingShip = false;
+        bool EnableDebug = false;
         MySpectatorCameraController CameraController = null;
 
         #region Base Methods
@@ -51,7 +52,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                 ShipEntity.Physics.Activate();
             }
 
-            ShipEntity.Update();
+            ShipEntity.Update(EnableDebug);
 
             if (CameraController == null || ShipEntity.Physics == null)
                 return;
@@ -59,7 +60,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             if (IsControllingShip)
             {
                 ShipEntity.Physics.LinearVelocity += Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix);
-                ShipEntity.Physics.AngularVelocity = Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix);
+                ShipEntity.Physics.AngularVelocity += Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix);
                 //ShipEntity.Physics.SetSpeeds(
                 //    ShipEntity.Physics.LinearVelocity + Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix),
                 //    Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix));
@@ -77,6 +78,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             // Toggle IsControllingShip
             if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.Insert))
                 SetControllingShip(!IsControllingShip);
+            // Toggle debug
+            if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.Home))
+                EnableDebug = !EnableDebug;
+
             if (IsControllingShip)
             {
                 if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F6))
