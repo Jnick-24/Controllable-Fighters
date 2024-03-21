@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controllable Fighters", "Controllable Fighters.csproj", "{219E8D11-8296-4D11-82D4-4A09CA49CE1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{219E8D11-8296-4D11-82D4-4A09CA49CE1A}.Debug|x64.ActiveCfg = Debug|x64
+		{219E8D11-8296-4D11-82D4-4A09CA49CE1A}.Debug|x64.Build.0 = Debug|x64
+		{219E8D11-8296-4D11-82D4-4A09CA49CE1A}.Release|x64.ActiveCfg = Release|x64
+		{219E8D11-8296-4D11-82D4-4A09CA49CE1A}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47438660-2171-419A-813A-BB0C1E6BFCCE}
+	EndGlobalSection
+EndGlobal
