@@ -77,14 +77,17 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             // Toggle IsControllingShip
             if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.Insert))
                 SetControllingShip(!IsControllingShip);
-            if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F6))
-                SetControllingShip(false);
-            if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F7))
-                SetControllingShip(false);
-            if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F8))
-                SetControllingShip(false);
-            if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F9))
-                SetControllingShip(false);
+            if (IsControllingShip)
+            {
+                if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F6))
+                    SetControllingShip(false);
+                if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F7))
+                    SetControllingShip(false);
+                if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F8))
+                    SetControllingShip(false);
+                if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.F9))
+                    SetControllingShip(false);
+            }
         }
 
         public override void Draw()

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using VRageMath;
 using Controllable_Fighters.Data.Scripts.Debug;
 using Sandbox.ModAPI;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using VRage.Input;
 
 namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 {
@@ -43,9 +45,8 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
         public void ApplyForce(ControllablePlane plane, float delta = 1/60f, bool debug = false)
         {
-            Vector3D relativePos = CenterOfPressure + plane.PositionComp.GetPosition();
-
-            Vector3 localVelocity = Vector3D.Rotate(plane.Physics.GetVelocityAtPoint(plane.PositionComp.GetPosition() + Vector3D.Rotate(CenterOfPressure, plane.WorldMatrix)), plane.WorldMatrix);
+            //Vector3 localVelocity = plane.Physics.GetVelocityAtPoint(LocalToWorld(CenterOfPressure, plane));
+            Vector3 localVelocity = WorldToLocal(plane.Physics.LinearVelocity + plane.PositionComp.GetPosition(), plane);
             double speed = localVelocity.Length();
 
             if (speed <= 1)
@@ -55,10 +56,8 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             Vector3D dragDirection = -localVelocity.Normalized();
 
             // lift is always perpendicular to drag
-            Vector3D liftDirection = Vector3D.Cross(Vector3D.Cross(dragDirection, Normal), dragDirection).Normalized();
-
-            if ((liftDirection + localVelocity).Length() > speed)
-                liftDirection = -liftDirection;
+            //Vector3D liftDirection = Vector3D.Cross(Vector3D.Cross(dragDirection, Normal), dragDirection).Normalized();
+            Vector3D liftDirection = Normal;
 
             // angle between chord line and air flow
             double angleOfAttack = MathHelper.ToDegrees(Math.Asin(Vector3D.Dot(dragDirection, Normal)));
@@ -69,10 +68,8 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
             if (FlapRatio > 0)
             {
-                double deflectionRatio = ControlInput;
-
                 // lift coefficient changes based on flap deflection
-                double delta_lift_coeff = Math.Sqrt(FlapRatio) * Airfoil.ClMax * deflectionRatio;
+                double delta_lift_coeff = Math.Sqrt(FlapRatio) * Airfoil.ClMax * ControlInput;
                 liftCoefficient += delta_lift_coeff;
             }
 
@@ -89,13 +86,26 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
             if (debug)
             {
-                DebugDraw.DrawLineZT(Vector3D.Zero, localVelocity, Color.Green, 0.25f);
-                DebugDraw.DrawLineZT(Vector3D.Zero, Vector3D.Rotate(lift, plane.WorldMatrix), Color.Blue, 0.25f);
-                DebugDraw.DrawLineZT(Vector3D.Zero, Vector3D.Rotate(drag, plane.WorldMatrix), Color.Red, 0.25f);
-                MyAPIGateway.Utilities.ShowNotification($"AoA: {Math.Round(angleOfAttack, 1)}", 1000/60);
+                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(localVelocity, plane), Color.Green, 0.25f);
+                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(Vector3D.Forward * 100, plane), Color.White, 0.15f);
+                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(lift, plane), Color.Blue, 0.25f);
+                DebugDraw.DrawLineZT(plane.PositionComp.GetPosition(), LocalToWorld(drag, plane), Color.Red, 0.25f);
+                DebugDraw.AddGPS("Fighter", plane.PositionComp.GetPosition(), 1/60f);
+                MyAPIGateway.Utilities.ShowNotification($"AoA: {Math.Round(angleOfAttack, 1)} | Drag: {drag.Length()} | Lift: {lift.Length()}", 1000/60);
             }
 
-            plane.Physics.AddForce(VRage.Game.Components.MyPhysicsForceType.APPLY_WORLD_FORCE, Vector3D.Rotate(lift + drag, plane.WorldMatrix), plane.PositionComp.GetPosition() + Vector3D.Rotate(CenterOfPressure, plane.WorldMatrix), null);
+            plane.Physics.ApplyImpulse(Vector3D.Rotate((lift + drag), plane.WorldMatrix) * delta, CenterOfPressure);
+            //plane.Physics.AngularVelocity = Vector3.Zero;
+        }
+
+        Vector3D WorldToLocal(Vector3D pos, ControllablePlane plane)
+        {
+            MatrixD inv = MatrixD.Invert(plane.WorldMatrix);
+            return Vector3D.Rotate(pos - plane.PositionComp.GetPosition(), inv);
+        }
+        Vector3D LocalToWorld(Vector3D pos, ControllablePlane plane)
+        {
+            return Vector3D.Rotate(pos, plane.WorldMatrix) + plane.PositionComp.GetPosition();
         }
     }
 }
