@@ -8,6 +8,7 @@ using Controllable_Fighters.Data.Scripts.Debug;
 using Sandbox.ModAPI;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using VRage.Input;
+using VRage.Game.Entity;
 
 namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 {
@@ -17,24 +18,28 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
     {
         const float EfficencyRatio = 1;
 
-        string Name;
+        public string Name;
         CT_Airfoil Airfoil;
         Vector3D CenterOfPressure;
         float Area;
         float Wingspan;
-        Vector3D Normal;
+        public Vector3D Normal;
+        public readonly Vector3D RestNormal;
+        public readonly Vector3D RotationAxis;
         float AspectRatio;
         float FlapRatio;
 
         float ControlInput = 0;
 
-        public CT_Wing(string name, Vector3D position, float span, float chord, CT_Airfoil airfoil, Vector3D normal, float flapRatio = 0.25f)
+        public CT_Wing(string name, Vector3D position, float span, float chord, CT_Airfoil airfoil, Vector3D normal, Vector3 rotationAxis, float flapRatio = 0.25f)
         {
             Name = name;
             Airfoil = airfoil;
             CenterOfPressure = position;
             Area = span * chord;
             Wingspan = span;
+            RestNormal = normal;
+            RotationAxis = rotationAxis;
             Normal = normal;
             AspectRatio = span * span / Area;
             FlapRatio = flapRatio;
@@ -45,8 +50,24 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             ControlInput = MathHelper.Clamp(input, -1, 1);
         }
 
+        public void SetAngle(float angle)
+        {
+            Normal = RestNormal.Rotate(RotationAxis, angle);
+        }
+
+        private void RotateSubpart(ControllablePlane plane)
+        {
+            MyEntitySubpart subpart = plane.SubpartManager.GetSubpart(plane, Name);
+            if (subpart == null)
+                return;
+            Matrix matrix = Matrix.CreateFromDir(Normal.Cross(RotationAxis), Normal);
+            plane.SubpartManager.LocalRotateSubpart(subpart, matrix);
+        }
+
         public void ApplyForce(ControllablePlane plane, float delta = 1/60f, bool debug = false)
         {
+            RotateSubpart(plane);
+
             //Vector3 localVelocity = plane.Physics.GetVelocityAtPoint(LocalToWorld(CenterOfPressure, plane));
             Vector3 localVelocity = WorldToLocal(plane.Physics.LinearVelocity + plane.PositionComp.GetPosition(), plane);
             double speed = localVelocity.Length();

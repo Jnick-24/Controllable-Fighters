@@ -67,7 +67,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                 //    ShipEntity.Physics.LinearVelocity + Vector3D.Rotate(MyAPIGateway.Input.GetPositionDelta(), ShipEntity.WorldMatrix),
                 //    Vector3D.Rotate(new Vector3(MyAPIGateway.Input.GetRotation() * MyAPIGateway.Input.GetMouseSensitivity(), MyAPIGateway.Input.GetRoll() * 10) * Sensitivity, -ShipEntity.WorldMatrix));
 
-
+                Vector2 rotation = MyAPIGateway.Input.GetRotation();
+                ShipEntity.Pitch = rotation.X;
+                ShipEntity.Yaw = rotation.Y;
+                ShipEntity.Roll = MyAPIGateway.Input.GetRoll();
             }
         }
 
