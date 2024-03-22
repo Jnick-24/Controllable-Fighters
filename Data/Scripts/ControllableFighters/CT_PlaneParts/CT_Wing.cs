@@ -16,7 +16,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
 
     internal class CT_Wing
     {
-        const float EfficencyRatio = 1;
+        const float EfficencyRatio = 1f;
 
         public string Name;
         CT_Airfoil Airfoil;
@@ -111,10 +111,9 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             {
                 Vector3D actualPosition = LocalToWorld(CenterOfPressure, plane);
                 
-                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(Normal * 2 + CenterOfPressure, plane), Color.Green, 0.15f);
-                //DebugDraw.DrawLineZT(LocalToWorld(CenterOfPressure, plane), LocalToWorld(Vector3D.Forward * 100, plane), Color.White, 0.15f);
-                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(lift/plane.Physics.Mass + CenterOfPressure, plane), Color.Blue, 0.25f);
-                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(drag/plane.Physics.Mass + CenterOfPressure, plane), Color.Red, 0.25f);
+                DebugDraw.DrawLineZT(actualPosition + plane.Physics.LinearVelocity * 1 / 60f, LocalToWorld(Normal * 2 + CenterOfPressure, plane) + plane.Physics.LinearVelocity * 1 / 60f, Color.Green, 0.15f);
+                DebugDraw.DrawLineZT(actualPosition + plane.Physics.LinearVelocity * 1 / 60f, LocalToWorld(lift/plane.Physics.Mass + CenterOfPressure, plane) + plane.Physics.LinearVelocity * 1 / 60f, Color.Blue, 0.25f);
+                DebugDraw.DrawLineZT(actualPosition + plane.Physics.LinearVelocity * 1 / 60f, LocalToWorld(drag/plane.Physics.Mass + CenterOfPressure, plane) + plane.Physics.LinearVelocity * 1 / 60f, Color.Red, 0.25f);
                 DebugDraw.AddGPS(Name, actualPosition, 1/60f);
 
                 //MyAPIGateway.Utilities.ShowNotification($"AoA: {Math.Round(angleOfAttack, 1)} | Drag: {drag.Length()} | Lift: {lift.Length()}", 1000/60);

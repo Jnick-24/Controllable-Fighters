@@ -19,7 +19,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
         internal SubpartManager SubpartManager = new SubpartManager();
 
         const float mass = 10000.0f;
-        const float Thrust = 100000.0f;
+        const float Thrust = 1000000.0f;
 
         const float wing_offset = 1.0f;
         const float tail_offset = 6.6f;
@@ -82,10 +82,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
                         wing.SetAngle(-Roll);
                         break;
                     case "Elevator":
-                        wing.SetAngle(-Pitch);
+                        wing.SetAngle(Pitch * 0.5f);
                         break;
                     case "Rudder":
-                        wing.SetAngle(Yaw);
+                        wing.SetAngle(Yaw * 0.5f);
                         break;
                 }
             }

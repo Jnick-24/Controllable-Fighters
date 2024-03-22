@@ -54,6 +54,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             }
 
             ShipEntity.Update(EnableDebug);
+            CameraParent.Physics.LinearVelocity = ShipEntity.Physics.LinearVelocity;
 
             MyAPIGateway.Utilities.ShowNotification($"Controlling: {IsControllingShip} | ThirdPerson: {IsThirdPerson}", 1000 / 60);
             MyAPIGateway.Utilities.ShowNotification($"ShipVel: {Math.Round(ShipEntity.Physics.LinearVelocity.Length(), 1)} | Throttle: {Math.Round(ShipEntity.Throttle * 100, 0)}", 1000 / 60);

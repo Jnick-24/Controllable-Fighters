@@ -23,6 +23,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         public virtual void Init(IMyModContext ModContext, string model)
         {
             Init(null, model, null, null);
+
+            if (model == null || model == "")
+                Flags &= ~EntityFlags.Visible;
+
             Save = false;
             NeedsWorldMatrix = true;
 
