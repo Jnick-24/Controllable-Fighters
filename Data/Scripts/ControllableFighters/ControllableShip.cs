@@ -41,17 +41,22 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 
         private void CreatePhysics()
         {
-            PhysicsSettings settings = new PhysicsSettings();
-            settings.RigidBodyFlags |= RigidBodyFlag.RBF_UNLOCKED_SPEEDS;
-            settings.CollisionLayer |= CollisionLayers.DefaultCollisionLayer;
-            settings.IsPhantom = false;
-            //settings.RigidBodyFlags |= RigidBodyFlag.RBF_DOUBLED_KINEMATIC;
-            settings.DetectorColliderCallback += HitCallback;
-            settings.Entity = this;
-            settings.WorldMatrix = WorldMatrix;
-            settings.Mass = new ModAPIMass(PositionComp.LocalAABB.Volume(), 10000, Vector3.Zero, new Matrix(48531.0f, -1320.0f, 0.0f, -1320.0f, 256608.0f, 0.0f, 0.0f, 0.0f, 211333.0f));
+            PhysicsSettings settings = MyAPIGateway.Physics.CreateSettingsForPhysics(
+                this,
+                WorldMatrix,
+                Vector3.Zero,
+                linearDamping: 0,
+                angularDamping: 0,
+                collisionLayer: CollisionLayers.DefaultCollisionLayer,
+                rigidBodyFlags: RigidBodyFlag.RBF_UNLOCKED_SPEEDS,
+                isPhantom: false,
+                mass: new ModAPIMass(PositionComp.LocalAABB.Volume(), 10000, Vector3.Zero, new Matrix(48531.0f, -1320.0f, 0.0f, -1320.0f, 256608.0f, 0.0f, 0.0f, 0.0f, 211333.0f))
+                );
+
+            //settings.DetectorColliderCallback += HitCallback;
             //settings.Entity.Flags |= EntityFlags.IsGamePrunningStructureObject;
-            MyAPIGateway.Physics.CreateBoxPhysics(settings, Vector3.Half, 0);
+            MyAPIGateway.Physics.CreateBoxPhysics(settings, PositionComp.LocalAABB.HalfExtents, 0);
+
             Physics.Enabled = true;
             Physics.Activate();
         }

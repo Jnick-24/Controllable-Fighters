@@ -30,6 +30,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         ControllablePlane ShipEntity = new ControllablePlane();
         bool IsControllingShip = false;
         bool EnableDebug = false;
+        bool IsThirdPerson = false;
         MySpectatorCameraController CameraController = null;
 
         #region Base Methods
@@ -38,8 +39,6 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         {
             if (MyAPIGateway.Utilities.IsDedicated)
                 return;
-            MyAPIGateway.Session.CameraController.IsInFirstPersonView = false;
-
             ShipEntity.Init(ModContext);
         }
 
@@ -53,8 +52,8 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 
             ShipEntity.Update(EnableDebug);
 
-            MyAPIGateway.Utilities.ShowNotification($"Controlling: {IsControllingShip} | Throttle: {Math.Round(ShipEntity.Throttle * 100, 0)}", 1000 / 60);
-            MyAPIGateway.Utilities.ShowNotification($"ShipVel: {Math.Round(ShipEntity.Physics.LinearVelocity.Length(), 1)}", 1000 / 60);
+            MyAPIGateway.Utilities.ShowNotification($"Controlling: {IsControllingShip} | ThirdPerson: {IsThirdPerson}", 1000 / 60);
+            MyAPIGateway.Utilities.ShowNotification($"ShipVel: {Math.Round(ShipEntity.Physics.LinearVelocity.Length(), 1)} | Throttle: {Math.Round(ShipEntity.Throttle * 100, 0)}", 1000 / 60);
 
             if (CameraController == null || ShipEntity.Physics == null)
                 return;
@@ -106,6 +105,12 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                     ShipEntity.Throttle += 0.01f;
                 if (MyAPIGateway.Input.IsKeyPress(MyKeys.Control))
                     ShipEntity.Throttle -= 0.01f;
+
+                // Third Person
+                if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.V))
+                {
+                    IsThirdPerson = !IsThirdPerson;
+                }
             }
         }
 
@@ -116,8 +121,11 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             if (CameraController == null)
                 return;
 
-            CameraController.Position = ShipEntity.PositionComp.GetPosition() + ShipEntity.Physics.LinearVelocity * 1 / 60f;
             CameraController.SetViewMatrix(ShipEntity.GetViewMatrix());
+
+            CameraController.ForceFirstPersonCamera = false;
+            CameraController.IsInFirstPersonView = !IsThirdPerson;
+            CameraController.ThirdPersonCameraDelta = Vector3D.Backward * 10;
             //CameraController.SetTarget(ShipEntity.PositionComp.GetPosition() + ShipEntity.WorldMatrix.Forward, ShipEntity.PositionComp.GetPosition() + ShipEntity.WorldMatrix.Up);
         }
 
