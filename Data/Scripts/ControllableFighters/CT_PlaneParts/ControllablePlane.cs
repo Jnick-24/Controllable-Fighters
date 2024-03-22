@@ -41,9 +41,9 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             }
         }
 
-        public override void Init(IMyModContext ModContext)
+        public override void Init(IMyModContext ModContext, string model)
         {
-            base.Init(ModContext);
+            base.Init(ModContext, model);
 
             Engine = new CT_Engine(Thrust);
 
@@ -64,6 +64,10 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
         public void Update(bool debug)
         {
             Engine.ApplyForce(this);
+
+            Pitch = MathHelper.Clamp(Pitch, -1, 1);
+            Yaw = MathHelper.Clamp(Yaw, -1, 1);
+            Roll = MathHelper.Clamp(Roll, -1, 1);
 
             foreach (var wing in Wings)
             {
@@ -87,10 +91,6 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             }
 
             Debug.DebugDraw.AddGPS("Fighter", PositionComp.GetPosition(), 1 / 60f);
-
-            Pitch *= 0.9f;
-            Yaw *= 0.9f;
-            Roll *= 0.9f;
         }
     }
 }

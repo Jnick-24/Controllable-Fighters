@@ -20,11 +20,11 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
 {
     internal class ControllableShip : MyEntity
     {
-        public virtual void Init(IMyModContext ModContext)
+        public virtual void Init(IMyModContext ModContext, string model)
         {
-            Init(null, ModContext.ModPath + "\\Models\\PlaneModel.mwm", null, null);
+            Init(null, model, null, null);
             Save = false;
-            NeedsWorldMatrix = false;
+            NeedsWorldMatrix = true;
 
             //Flags |= EntityFlags.Visible;
             //Flags |= EntityFlags.Near;

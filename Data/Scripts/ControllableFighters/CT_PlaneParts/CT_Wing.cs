@@ -61,7 +61,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             if (subpart == null)
                 return;
             Matrix matrix = Matrix.CreateFromDir(Normal.Cross(RotationAxis), Normal);
-            plane.SubpartManager.LocalRotateSubpart(subpart, matrix);
+            plane.SubpartManager.LocalRotateSubpartAbs(subpart, matrix);
         }
 
         public void ApplyForce(ControllablePlane plane, float delta = 1/60f, bool debug = false)
@@ -111,7 +111,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters.PlaneParts
             {
                 Vector3D actualPosition = LocalToWorld(CenterOfPressure, plane);
                 
-                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(localVelocity + CenterOfPressure, plane), Color.Green, 0.25f);
+                DebugDraw.DrawLineZT(actualPosition, LocalToWorld(Normal * 2 + CenterOfPressure, plane), Color.Green, 0.15f);
                 //DebugDraw.DrawLineZT(LocalToWorld(CenterOfPressure, plane), LocalToWorld(Vector3D.Forward * 100, plane), Color.White, 0.15f);
                 DebugDraw.DrawLineZT(actualPosition, LocalToWorld(lift/plane.Physics.Mass + CenterOfPressure, plane), Color.Blue, 0.25f);
                 DebugDraw.DrawLineZT(actualPosition, LocalToWorld(drag/plane.Physics.Mass + CenterOfPressure, plane), Color.Red, 0.25f);

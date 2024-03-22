@@ -28,6 +28,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         const float Sensitivity = 0.1f;
 
         ControllablePlane ShipEntity = new ControllablePlane();
+        ControllableShip CameraParent = new ControllableShip();
         bool IsControllingShip = false;
         bool EnableDebug = false;
         bool IsThirdPerson = false;
@@ -39,7 +40,9 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
         {
             if (MyAPIGateway.Utilities.IsDedicated)
                 return;
-            ShipEntity.Init(ModContext);
+            ShipEntity.Init(ModContext, ModContext.ModPath + "\\Models\\PlaneModel.mwm");
+            CameraParent.Init(ModContext, null);
+            ShipEntity.Hierarchy.AddChild(CameraParent);
         }
 
         public override void UpdateBeforeSimulation()
@@ -78,7 +81,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             if (CameraController != null)
             {
                 // Prevent micromovements when using movement controls
-                CameraController.Position = ShipEntity.PositionComp.GetPosition() + ShipEntity.Physics.LinearVelocity * 1/60f;
+                CameraController.Position = CameraParent.PositionComp.GetPosition() + CameraParent.Physics.LinearVelocity * 1/60f;
             }
 
             // Toggle IsControllingShip
@@ -110,6 +113,13 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
                 if (MyAPIGateway.Input.IsNewKeyPressed(MyKeys.V))
                 {
                     IsThirdPerson = !IsThirdPerson;
+
+                    Matrix matrix = Matrix.Identity;
+                    if (IsThirdPerson)
+                    {
+                        matrix = Matrix.CreateWorld(Vector3.Backward * 15 + Vector3.Up * 5, Vector3.Forward, Vector3.Up);
+                    }
+                    CameraParent.PositionComp.SetLocalMatrix(ref matrix);
                 }
             }
         }
@@ -121,11 +131,13 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             if (CameraController == null)
                 return;
 
-            CameraController.SetViewMatrix(ShipEntity.GetViewMatrix());
+            CameraController.SetViewMatrix(CameraParent.GetViewMatrix());
+            CameraController.Position = CameraParent.PositionComp.GetPosition() + CameraParent.Physics.LinearVelocity * 1 / 60f;
 
-            CameraController.ForceFirstPersonCamera = false;
-            CameraController.IsInFirstPersonView = !IsThirdPerson;
-            CameraController.ThirdPersonCameraDelta = Vector3D.Backward * 10;
+            //CameraController.ForceFirstPersonCamera = false;
+            //CameraController.IsInFirstPersonView = !IsThirdPerson;
+            //CameraController.ThirdPersonCameraDelta = Vector3D.Backward * 10;
+
             //CameraController.SetTarget(ShipEntity.PositionComp.GetPosition() + ShipEntity.WorldMatrix.Forward, ShipEntity.PositionComp.GetPosition() + ShipEntity.WorldMatrix.Up);
         }
 
@@ -138,7 +150,7 @@ namespace Controllable_Fighters.Data.Scripts.ControllableFighters
             if (IsControllingShip)
             {
                 //MyAPIGateway.SpectatorTools.SetTarget(ShipEntity);
-                MyAPIGateway.Session.SetCameraController(MyCameraControllerEnum.SpectatorFreeMouse, ShipEntity, Vector3D.Zero);
+                MyAPIGateway.Session.SetCameraController(MyCameraControllerEnum.SpectatorFreeMouse, CameraParent, Vector3D.Zero);
                 CameraController = MyAPIGateway.Session.CameraController as MySpectatorCameraController;
             }
             else
